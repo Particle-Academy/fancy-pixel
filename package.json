@@ -1,0 +1,65 @@
+{
+  "name": "@particle-academy/fancy-pixel",
+  "version": "0.0.0",
+  "description": "Embeddable Fancy UI verification badge + liveness beacon. Zero-dependency vanilla TS, Shadow-DOM rendered (host CSS can't hide it), with an IntersectionObserver visibility check and a sendBeacon liveness ping. Badge / Mark / Beacon styles, placed / floating modes.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Particle-Academy/fancy-pixel.git"
+  },
+  "homepage": "https://github.com/Particle-Academy/fancy-pixel#readme",
+  "bugs": "https://github.com/Particle-Academy/fancy-pixel/issues",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/fancy-pixel.global.min.js",
+  "jsdelivr": "./dist/fancy-pixel.global.min.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./global": "./dist/fancy-pixel.global.min.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "tsc --noEmit",
+    "test": "node --test",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "tsup"
+  },
+  "keywords": [
+    "fancy-ui",
+    "badge",
+    "verification",
+    "beacon",
+    "pixel",
+    "shadow-dom",
+    "human-plus",
+    "agent",
+    "analytics"
+  ],
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}

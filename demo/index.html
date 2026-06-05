@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>fancy-pixel demo — 3 styles × 2 modes</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: #0b0b12;
+        color: #e7e7f0;
+        padding: 24px;
+      }
+      h1 { font-size: 18px; margin: 0 0 4px; }
+      p.sub { margin: 0 0 20px; color: #9a9ab0; font-size: 13px; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+      }
+      .cell {
+        border: 1px solid #23233a;
+        border-radius: 12px;
+        padding: 16px;
+        background: #12121e;
+        min-height: 96px;
+      }
+      .cell h2 {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #8a8aa6;
+        margin: 0 0 12px;
+      }
+      .slot { min-height: 36px; display: flex; align-items: center; }
+      #log {
+        margin-top: 24px;
+        border: 1px solid #23233a;
+        border-radius: 12px;
+        background: #0e0e18;
+        padding: 12px 14px;
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        max-height: 280px;
+        overflow: auto;
+      }
+      #log .row { padding: 2px 0; border-bottom: 1px solid #1a1a2a; }
+      #log .row b { color: #22d3ee; }
+      .pill {
+        display: inline-block;
+        font-size: 11px;
+        color: #a78bfa;
+        border: 1px solid #2a2a44;
+        border-radius: 999px;
+        padding: 1px 8px;
+        margin-left: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>fancy-pixel demo <span class="pill">offline round-trip</span></h1>
+    <p class="sub">
+      All three styles (badge / mark / beacon) in both modes (placed / floating).
+      Beacon POSTs are intercepted by a mock <code>sendBeacon</code> /
+      <code>fetch</code> and logged below — proving the
+      <code>/heuristics/pixel</code> round-trip without a server.
+    </p>
+
+    <div class="grid">
+      <div class="cell">
+        <h2>Badge · placed</h2>
+        <div class="slot" id="slot-badge-placed"></div>
+      </div>
+      <div class="cell">
+        <h2>Mark · placed</h2>
+        <div class="slot" id="slot-mark-placed"></div>
+      </div>
+      <div class="cell">
+        <h2>Beacon · placed</h2>
+        <div class="slot" id="slot-beacon-placed"></div>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top: 20px">
+      Floating variants pin to the bottom-right corner (stacked here so all three
+      are visible at once for the demo).
+    </p>
+
+    <h2 style="font-size: 13px; color: #8a8aa6">Beacon log</h2>
+    <div id="log"></div>
+
+    <script type="module">
+      // --- Mock the beacon transport so the round-trip is demonstrable offline.
+      const log = document.getElementById("log");
+      function logBeacon(via, url, body) {
+        const row = document.createElement("div");
+        row.className = "row";
+        const data = JSON.parse(body);
+        row.innerHTML =
+          `<b>${via}</b> → ${url} ` +
+          `<span style="color:#9a9ab0">${JSON.stringify(data)}</span>`;
+        log.prepend(row);
+      }
+
+      // Intercept navigator.sendBeacon.
+      const realSendBeacon = navigator.sendBeacon?.bind(navigator);
+      navigator.sendBeacon = (url, blob) => {
+        blob.text().then((t) => logBeacon("sendBeacon", url, t));
+        return true; // pretend success; do NOT hit the network
+      };
+      // Intercept fetch fallback too.
+      const realFetch = window.fetch;
+      window.fetch = (url, opts = {}) => {
+        if (typeof url === "string" && url.endsWith("/pixel")) {
+          logBeacon("fetch", url, opts.body);
+          return Promise.resolve(new Response(null, { status: 204 }));
+        }
+        return realFetch(url, opts);
+      };
+
+      document.addEventListener("fancy-pixel:shown", (e) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `<b style="color:#a78bfa">fancy-pixel:shown</b> ${JSON.stringify(
+          { style: e.detail.style, mode: e.detail.mode, siteKey: e.detail.siteKey },
+        )}`;
+        log.prepend(row);
+      });
+
+      // --- Mount all combinations from the built ESM bundle.
+      import { mountPixel } from "../dist/index.js";
+
+      const endpoint = "https://mock.local/heuristics";
+      const siteKey = "DEMO";
+
+      // Placed (inline at each slot).
+      mountPixel({ style: "badge", mode: "placed", target: "#slot-badge-placed", siteKey, endpoint });
+      mountPixel({ style: "mark", mode: "placed", target: "#slot-mark-placed", siteKey, endpoint });
+      mountPixel({ style: "beacon", mode: "placed", target: "#slot-beacon-placed", siteKey, endpoint });
+
+      // Floating (fixed corner) — all three, stacked via destroy/re-mount offsets
+      // is overkill for a demo; just show the badge floating + log its beacon.
+      mountPixel({ style: "badge", mode: "floating", siteKey, endpoint });
+    </script>
+  </body>
+</html>
