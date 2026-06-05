@@ -1,7 +1,9 @@
 import { sendPixelBeacon } from "./beacon.js";
+import { createPixelCollector } from "./collector.js";
 import { createPixelHost } from "./render.js";
 import type {
   MountPixelOptions,
+  PixelCollector,
   PixelHandle,
   PixelMode,
   PixelShownEventDetail,
@@ -32,6 +34,12 @@ function currentPath(): string {
  * wires an IntersectionObserver to confirm true on-screen visibility, dispatches
  * a `fancy-pixel:shown` CustomEvent on first visibility, and POSTs a liveness
  * beacon to `${endpoint}/pixel` on mount and on every visibility change.
+ *
+ * When `endpoint` is set and `collect` is left on (the default), it ALSO starts
+ * the bundled `@particle-academy/fancy-heuristics-js` collector, streaming the
+ * site's full interaction data (clicks / scroll depth / pointer heatmap / dwell
+ * + agent activity) to `${endpoint}/collect` — one embed does badge +
+ * verification + analytics. With no `endpoint`, nothing is sent (badge only).
  */
 export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
   const style: PixelStyle = STYLES.includes(opts.style as PixelStyle)
@@ -42,6 +50,7 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
     : "floating";
   const siteKey = opts.siteKey ?? "";
   const endpoint = opts.endpoint ?? "";
+  const collect = opts.collect !== false; // default on; only an explicit false opts out
   const href = opts.href ?? DEFAULT_HREF;
   const target = opts.target ?? null;
 
@@ -114,11 +123,27 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
   // observer reports (visible defaults false until proven).
   beacon();
 
+  // All-in-one analytics: with an endpoint and collection left on, start the
+  // bundled fancy-heuristics-js collector so this single embed also streams the
+  // site's interaction data to `${endpoint}/collect`, keyed by siteKey. No
+  // endpoint => no collection (badge-only), matching the beacon's behaviour.
+  let collector: PixelCollector | null = null;
+  if (endpoint && collect) {
+    try {
+      collector = createPixelCollector({ siteKey, endpoint });
+      collector.start();
+    } catch {
+      // A collector failure must never break the host page or the badge.
+      collector = null;
+    }
+  }
+
   const resolved: PixelHandle["options"] = {
     style,
     mode,
     siteKey,
     endpoint,
+    collect,
     href,
     target,
   };
@@ -128,12 +153,23 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
     get visible() {
       return visible;
     },
+    get collector() {
+      return collector;
+    },
     options: resolved,
     destroy() {
       if (destroyed) return;
       destroyed = true;
       observer?.disconnect();
       observer = null;
+      if (collector) {
+        try {
+          collector.stop();
+        } catch {
+          /* swallow — teardown must never throw into the host */
+        }
+        collector = null;
+      }
       host.remove();
     },
   };

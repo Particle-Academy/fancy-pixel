@@ -23,11 +23,18 @@ export { mountPixel } from "./mount.js";
 export { autoInit } from "./autoinit.js";
 export { sendPixelBeacon } from "./beacon.js";
 export { createPixelHost, hostStyleFor } from "./render.js";
+export {
+  createPixelCollector,
+  __setCollectorFactory,
+  type CollectorFactory,
+  type PixelCollectorOptions,
+} from "./collector.js";
 export type {
   PixelStyle,
   PixelMode,
   MountPixelOptions,
   PixelHandle,
+  PixelCollector,
   PixelBeaconPayload,
   PixelShownEventDetail,
 } from "./types.js";

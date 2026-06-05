@@ -26,10 +26,21 @@ export interface MountPixelOptions {
   /** Site identifier sent with every beacon. Required for meaningful beacons. */
   siteKey?: string;
   /**
-   * Base URL of the fancy-heuristics ingestion host. The pixel POSTs to
-   * `${endpoint}/pixel`. If omitted, no beacon is sent.
+   * Base URL of the fancy-heuristics ingestion host. The pixel POSTs the
+   * liveness beacon to `${endpoint}/pixel` and (when {@link collect} is on)
+   * streams interaction analytics to `${endpoint}/collect`. If omitted, the
+   * pixel renders badge-only — no beacon, no collection, no network at all.
    */
   endpoint?: string;
+  /**
+   * Stream full interaction analytics (clicks / scroll depth / pointer heatmap /
+   * dwell + agent activity) to `${endpoint}/collect` via the bundled
+   * `@particle-academy/fancy-heuristics-js` collector. Defaults to `true` — one
+   * embed delivers badge + verification + analytics, Google-Analytics-style.
+   * Set to `false` (or `data-collect="false"`) to render the badge and send the
+   * liveness beacon only. Has no effect when {@link endpoint} is omitted.
+   */
+  collect?: boolean;
   /**
    * Wordmark/link target. Defaults to `https://particle.academy`.
    * Applies to `badge` (whole chip) and `mark` (glyph).
@@ -47,17 +58,34 @@ export interface PixelBeaconPayload {
   ts: number;
 }
 
+/**
+ * Minimal structural shape of the bundled fancy-heuristics-js collector handle.
+ * Mirrors `@particle-academy/fancy-heuristics-js`'s `Collector` so we don't
+ * leak the dependency's types into the public surface.
+ */
+export interface PixelCollector {
+  start(): void;
+  stop(): void;
+  flush(): void;
+}
+
 /** Handle returned by {@link mountPixel} for programmatic control. */
 export interface PixelHandle {
   /** The host element carrying the open shadow root and data markers. */
   readonly host: HTMLElement;
   /** Whether the pixel is currently confirmed visible by the IntersectionObserver. */
   readonly visible: boolean;
+  /**
+   * The live interaction collector, when one was started (endpoint set and
+   * `collect !== false`). `null` for badge-only / beacon-only mounts.
+   * `destroy()` stops it automatically; exposed for observability + testing.
+   */
+  readonly collector: PixelCollector | null;
   /** Resolved options. */
   readonly options: Required<Omit<MountPixelOptions, "target">> & {
     target: string | Element | null;
   };
-  /** Tear down observers and remove the host element. */
+  /** Stop the collector, tear down observers, and remove the host element. */
   destroy(): void;
 }
 

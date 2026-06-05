@@ -9,6 +9,10 @@ import type { MountPixelOptions, PixelHandle } from "./types.js";
  *   <script src=".../fancy-pixel.global.min.js"
  *           data-style="badge" data-mode="floating"
  *           data-site="KEY" data-endpoint="https://host/heuristics"></script>
+ *
+ * Add `data-collect="false"` to render the badge + liveness beacon only and
+ * suppress the interaction-analytics collector (on by default when an endpoint
+ * is present).
  */
 function readScriptConfig(): MountPixelOptions | null {
   if (typeof document === "undefined") return null;
@@ -31,16 +35,22 @@ function readScriptConfig(): MountPixelOptions | null {
     ds.mode === undefined &&
     ds.site === undefined &&
     ds.endpoint === undefined &&
+    ds.collect === undefined &&
     ds.fancyPixel === undefined
   ) {
     return null;
   }
+
+  // `data-collect="false"` opts out of analytics; absent/anything-else = default on.
+  const collect =
+    ds.collect !== undefined ? ds.collect !== "false" : undefined;
 
   return {
     style: ds.style as MountPixelOptions["style"],
     mode: ds.mode as MountPixelOptions["mode"],
     siteKey: ds.site,
     endpoint: ds.endpoint,
+    collect,
     target: ds.target ?? null,
     href: ds.href,
   };

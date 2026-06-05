@@ -63,9 +63,11 @@
     <h1>fancy-pixel demo <span class="pill">offline round-trip</span></h1>
     <p class="sub">
       All three styles (badge / mark / beacon) in both modes (placed / floating).
-      Beacon POSTs are intercepted by a mock <code>sendBeacon</code> /
+      Beacon + analytics POSTs are intercepted by a mock <code>sendBeacon</code> /
       <code>fetch</code> and logged below — proving the
-      <code>/heuristics/pixel</code> round-trip without a server.
+      <code>/heuristics/pixel</code> (verification) <em>and</em>
+      <code>/heuristics/collect</code> (interaction analytics) round-trips
+      without a server. Move the mouse / click / scroll to see collect batches.
     </p>
 
     <div class="grid">
@@ -97,23 +99,34 @@
       function logBeacon(via, url, body) {
         const row = document.createElement("div");
         row.className = "row";
-        const data = JSON.parse(body);
+        let data;
+        try { data = JSON.parse(body); } catch { data = body; }
+        const kind = url.endsWith("/collect") ? "collect" : "pixel";
+        const accent = kind === "collect" ? "#a78bfa" : "#22d3ee";
         row.innerHTML =
-          `<b>${via}</b> → ${url} ` +
+          `<b style="color:${accent}">${via}·${kind}</b> → ${url} ` +
           `<span style="color:#9a9ab0">${JSON.stringify(data)}</span>`;
         log.prepend(row);
       }
 
-      // Intercept navigator.sendBeacon.
-      const realSendBeacon = navigator.sendBeacon?.bind(navigator);
+      const isOurEndpoint = (url) =>
+        typeof url === "string" &&
+        (url.endsWith("/pixel") || url.endsWith("/collect"));
+
+      // Intercept navigator.sendBeacon (used by both the pixel beacon AND the
+      // bundled fancy-heuristics-js collector).
       navigator.sendBeacon = (url, blob) => {
-        blob.text().then((t) => logBeacon("sendBeacon", url, t));
+        if (isOurEndpoint(url)) {
+          Promise.resolve(blob.text ? blob.text() : blob).then((t) =>
+            logBeacon("sendBeacon", url, t),
+          );
+        }
         return true; // pretend success; do NOT hit the network
       };
       // Intercept fetch fallback too.
       const realFetch = window.fetch;
       window.fetch = (url, opts = {}) => {
-        if (typeof url === "string" && url.endsWith("/pixel")) {
+        if (isOurEndpoint(url)) {
           logBeacon("fetch", url, opts.body);
           return Promise.resolve(new Response(null, { status: 204 }));
         }
@@ -135,13 +148,14 @@
       const endpoint = "https://mock.local/heuristics";
       const siteKey = "DEMO";
 
-      // Placed (inline at each slot).
-      mountPixel({ style: "badge", mode: "placed", target: "#slot-badge-placed", siteKey, endpoint });
-      mountPixel({ style: "mark", mode: "placed", target: "#slot-mark-placed", siteKey, endpoint });
-      mountPixel({ style: "beacon", mode: "placed", target: "#slot-beacon-placed", siteKey, endpoint });
+      // Placed (inline at each slot). collect:false here so we don't spin up
+      // four overlapping collectors — these show the badge + /pixel beacon only.
+      mountPixel({ style: "badge", mode: "placed", target: "#slot-badge-placed", siteKey, endpoint, collect: false });
+      mountPixel({ style: "mark", mode: "placed", target: "#slot-mark-placed", siteKey, endpoint, collect: false });
+      mountPixel({ style: "beacon", mode: "placed", target: "#slot-beacon-placed", siteKey, endpoint, collect: false });
 
-      // Floating (fixed corner) — all three, stacked via destroy/re-mount offsets
-      // is overkill for a demo; just show the badge floating + log its beacon.
+      // Floating (fixed corner) — the all-in-one mount: badge + /pixel beacon +
+      // the bundled collector streaming /collect batches (move/click/scroll).
       mountPixel({ style: "badge", mode: "floating", siteKey, endpoint });
     </script>
   </body>
