@@ -1,5 +1,7 @@
 # @particle-academy/fancy-pixel
 
+[![Fancified](art/fancified.svg)](https://particle.academy)
+
 **All-in-one Fancy UI embed.** A single `<script>` renders the verification
 **badge** AND pipes the site's full interaction analytics to your host —
 Google-Analytics-style, keyed by `site_key`. Vanilla TypeScript, rendered
