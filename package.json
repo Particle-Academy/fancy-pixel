@@ -36,6 +36,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "tsc --noEmit",
+    "pretest": "tsup",
     "test": "node --test",
     "clean": "rm -rf dist",
     "prepublishOnly": "tsup"
