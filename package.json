@@ -1,6 +1,6 @@
 {
   "name": "@particle-academy/fancy-pixel",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "All-in-one embeddable Fancy UI pixel: one <script> renders the verification badge AND streams the site's full interaction analytics (clicks / scroll / pointer heatmap / dwell + agent activity) to the host, Google-Analytics-style, keyed by site_key. Shadow-DOM rendered (host CSS can't hide it), with an IntersectionObserver visibility check and a sendBeacon liveness ping. Bundles @particle-academy/fancy-heuristics-js. Badge / Mark / Beacon styles, placed / floating modes.",
   "repository": {
     "type": "git",
@@ -53,7 +53,7 @@
     "analytics"
   ],
   "dependencies": {
-    "@particle-academy/fancy-heuristics-js": "^0.2.0"
+    "@particle-academy/fancy-heuristics-js": ">=0.1 <2.0"
   },
   "devDependencies": {
     "tsup": "^8.5.0",

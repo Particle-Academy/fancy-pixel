@@ -14,6 +14,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-07-28
+
+### Fixed
+
+- **0.2.1 did not actually contain the range widen its entry describes.** The
+  `@particle-academy/fancy-heuristics-js` requirement went out as a caret, not
+  `>=0.1 <2.0`. The widen was real when it was written and was then
+  silently reverted before the tag: verifying it meant running
+  `npm install @particle-academy/fancy-heuristics-js@latest` to prove the
+  package builds against the newest sibling, and that command **rewrites the
+  range in `package.json` to a caret on whatever it just installed**. The
+  verification step overwrote the thing it was verifying.
+
+  0.2.1 is still an improvement on what came before it — the caret it shipped
+  points at the current sibling rather than a stale one, so the install that was
+  failing now succeeds. It just re-imposes the same cap one minor later. 0.2.2
+  carries the range the entry promised.
+
+  `devDependencies` deliberately keeps a caret: that pin is the version the
+  suite is built and tested against, and it is what makes the wide runtime range
+  a tested claim rather than a hopeful one.
+
 ## [0.2.1] — 2026-07-28
 
 ### Changed
