@@ -42,7 +42,7 @@ export interface MountPixelOptions {
    */
   collect?: boolean;
   /**
-   * Wordmark/link target. Defaults to `https://particle.academy`.
+   * Wordmark/link target. Defaults to `https://ui.particle.academy`.
    * Applies to `badge` (whole chip) and `mark` (glyph).
    */
   href?: string;

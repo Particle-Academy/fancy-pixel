@@ -10,7 +10,7 @@ import type {
   PixelStyle,
 } from "./types.js";
 
-const DEFAULT_HREF = "https://particle.academy";
+const DEFAULT_HREF = "https://ui.particle.academy";
 const STYLES: PixelStyle[] = ["badge", "mark", "beacon"];
 const MODES: PixelMode[] = ["placed", "floating"];
 

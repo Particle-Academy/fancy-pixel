@@ -1,6 +1,6 @@
 # @particle-academy/fancy-pixel
 
-[![Fancified](art/fancified.svg)](https://particle.academy)
+[![Fancified](art/fancified.svg)](https://ui.particle.academy)
 
 **All-in-one Fancy UI embed.** A single `<script>` renders the verification
 **badge** AND pipes the site's full interaction analytics to your host —
@@ -95,7 +95,7 @@ const pixel = mountPixel({
   siteKey: "YOUR_SITE_KEY",
   endpoint: "https://your-host/heuristics",
   collect: true, // default; set false for badge + beacon only
-  href: "https://particle.academy", // optional link target
+  href: "https://ui.particle.academy", // optional link target
 });
 
 // pixel.host      -> the host element (open shadow root + data markers)

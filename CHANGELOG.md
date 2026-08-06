@@ -14,6 +14,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 0.2.3 — 2026-08-06
+
+### Fixed
+
+- **The badge linked to the wrong site.** `href` defaulted to
+  `https://particle.academy`, which is *Particle Academy — The Community
+  Accelerator*, a different property. The Fancy UI kit lives at
+  **`https://ui.particle.academy`**, and that is now the default.
+
+  **What you must do:** nothing, unless you were relying on the old target. The
+  badge is the one outbound link the pixel places on your site, so every badge
+  shipped before this release has been sending visitors somewhere that says
+  nothing about the kit they just saw the badge for. Upgrading fixes it; a
+  pinned `href` is still honoured and overrides the default as before.
+
+  Both the README example and the `href` doc comment said the same wrong thing,
+  so anyone who copied the snippet has it hardcoded — search your own embeds for
+  `href: "https://particle.academy"` and drop the line to pick up the default.
+
 ## [0.2.2] — 2026-07-28
 
 ### Fixed
