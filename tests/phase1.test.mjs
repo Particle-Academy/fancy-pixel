@@ -224,3 +224,27 @@ test("the bundled collector is the v2 one: consent denied sends nothing, grantin
 test.after(() => {
   console.warn = realWarn;
 });
+
+// ── consent is denied by default (owner ruling, 2026-11-08) ─────────────────────
+
+test("a pixel with no consent option collects and sends nothing", () => {
+  reset();
+  __setCollectorFactory(null); // the real bundled collector
+  const h = mountPixel({ siteKey: "NOCONSENT", endpoint: "https://h/heuristics" });
+  h.collector.flush();
+  h.destroy();
+  assert.equal(beacons.filter((b) => b.url.endsWith("/collect")).length, 0, "nothing sent to /collect");
+  assert.equal(beacons.filter((b) => b.url.endsWith("/pixel")).length, 1, "the liveness beacon still fires");
+});
+
+test("a pixel with an explicit grant collects", () => {
+  for (const consent of [true, "granted", () => true]) {
+    reset();
+    __setCollectorFactory(null);
+    const h = mountPixel({ siteKey: "GRANTED", endpoint: "https://h/heuristics", consent });
+    h.destroy();
+    const collects = beacons.filter((b) => b.url.endsWith("/collect")).map((b) => JSON.parse(b.body));
+    assert.equal(collects.length, 1, `consent ${String(consent)}`);
+    assert.equal(collects[0].events[0].name, "ui.view");
+  }
+});

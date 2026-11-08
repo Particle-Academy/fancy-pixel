@@ -12,13 +12,13 @@
  * fancy-heuristics-js survives in `dist/fancy-pixel.global.min.js`.
  */
 import { createCollector as realCreateCollector } from "@particle-academy/fancy-heuristics-js";
-import type { PixelCollectLevel, PixelCollector, PixelRoute, PixelTrack } from "./types.js";
+import type { PixelCollectLevel, PixelCollector, PixelConsent, PixelRoute, PixelTrack } from "./types.js";
 
 /** Options forwarded to the underlying collector. */
 export interface PixelCollectorOptions {
   siteKey: string;
   endpoint: string;
-  consent?: "granted" | "denied";
+  consent?: PixelConsent;
   collect?: PixelCollectLevel;
   track?: PixelTrack;
   route?: () => PixelRoute | undefined;

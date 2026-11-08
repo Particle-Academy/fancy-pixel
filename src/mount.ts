@@ -50,13 +50,26 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
   const existing = key ? registry[key] : undefined;
   if (existing) {
     warnOnce(key);
-    if (opts.consent !== undefined) existing.setConsent(opts.consent === "granted");
+    if (opts.consent !== undefined) existing.setConsent(isGranted(opts.consent));
     return existing;
   }
 
   const handle = mountNew(opts);
   if (key) registry[key] = handle;
   return handle;
+}
+
+/** True only for an explicit grant, matching the bundled collector. */
+function isGranted(consent: MountPixelOptions["consent"]): boolean {
+  if (consent === true || consent === "granted") return true;
+  if (typeof consent === "function") {
+    try {
+      return consent() === true;
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
 
 /** Live pixels by site key, shared by every copy of the bundle on the page. */

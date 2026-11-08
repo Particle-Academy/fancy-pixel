@@ -47,12 +47,13 @@ export interface MountPixelOptions {
    */
   href?: string;
   /**
-   * Analytics consent for the collector. `"denied"` renders the badge and
-   * sends the liveness beacon, but collects nothing until
-   * `handle.setConsent(true)`. Omitted = `"granted"`, as in 0.3, for hosts
-   * that already withhold `endpoint` until consent.
+   * Analytics consent for the collector. **Denied by default**: without an
+   * explicit grant (`true`, `"granted"`, or a callback returning `true`) the
+   * pixel renders the badge and sends the liveness beacon, but collects
+   * nothing until `handle.setConsent(true)`. Leaving it out logs one
+   * development-only warning.
    */
-  consent?: "granted" | "denied";
+  consent?: PixelConsent;
   /** Collection tier. Default `"analytics"`; `"research"` adds pointer samples. */
   collectLevel?: PixelCollectLevel;
   /** Per-signal override of the tier. */
@@ -62,6 +63,9 @@ export interface MountPixelOptions {
   /** `"none"` records no accessible names of clicked controls. */
   labels?: "control" | "none";
 }
+
+/** How a host states analytics consent. Anything but an explicit grant is denied. */
+export type PixelConsent = boolean | "granted" | "denied" | (() => boolean);
 
 /** Collection tiers of the bundled collector. */
 export type PixelCollectLevel = "essential" | "analytics" | "research";

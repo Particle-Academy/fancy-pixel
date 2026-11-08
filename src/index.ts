@@ -41,4 +41,5 @@ export type {
   PixelCollectLevel,
   PixelTrack,
   PixelRoute,
+  PixelConsent,
 } from "./types.js";

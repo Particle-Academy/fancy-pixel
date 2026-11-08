@@ -55,9 +55,11 @@ function readScriptConfig(): MountPixelOptions | null {
     href: ds.href,
   };
 
-  // data-consent="denied": badge + liveness only until consent is granted
-  // (FancyPixel.processQueue / fancyPixelQ.push(["consent", {analytics:true}])).
-  if (ds.consent === "denied" || ds.consent === "granted") out.consent = ds.consent;
+  // Consent is denied unless data-consent="granted" (or "true"). Without it
+  // the tag renders the badge and sends the liveness beacon only, until
+  // fancyPixelQ.push(["consent", { analytics: true }]).
+  if (ds.consent === "granted" || ds.consent === "true") out.consent = "granted";
+  else if (ds.consent === "denied" || ds.consent === "false") out.consent = "denied";
   if (ds.collectLevel === "essential" || ds.collectLevel === "analytics" || ds.collectLevel === "research") {
     out.collectLevel = ds.collectLevel;
   }

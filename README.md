@@ -59,12 +59,19 @@ the verification beacon, and starts streaming interaction analytics:
   data-mode="floating"
   data-site="YOUR_SITE_KEY"
   data-endpoint="https://your-host/heuristics"
+  data-consent="granted"
 ></script>
 ```
 
 Attributes: `data-style` (`badge`|`mark`|`beacon`), `data-mode`
 (`placed`|`floating`), `data-site`, `data-endpoint`, optional `data-target`
-(selector, for `placed`), `data-href` (link target), and `data-collect`.
+(selector, for `placed`), `data-href` (link target), `data-collect` and
+`data-consent`.
+
+**Consent is denied by default.** Without `data-consent="granted"` (or a later
+`fancyPixelQ.push(["consent", { analytics: true }])`), the pixel renders the
+badge and sends the liveness beacon but collects no analytics. Only write
+`data-consent="granted"` when the visitor has agreed.
 
 **Badge-only opt-out:** add `data-collect="false"` to render the badge and send
 the liveness beacon but **not** stream interaction analytics:
@@ -95,6 +102,7 @@ const pixel = mountPixel({
   siteKey: "YOUR_SITE_KEY",
   endpoint: "https://your-host/heuristics",
   collect: true, // default; set false for badge + beacon only
+  consent: () => hasAnalyticsConsent(), // denied by default: nothing is collected without a grant
   href: "https://ui.particle.academy", // optional link target
 });
 
@@ -145,7 +153,7 @@ v2 fields. `destroy()` stops the collector (flushing any buffered events).
 
 | Option | `data-*` | Meaning |
 |---|---|---|
-| `consent` | `data-consent` | `"denied"` shows the badge and sends the liveness beacon but collects nothing until `handle.setConsent(true)`. Omitted = `"granted"`, as in 0.3. |
+| `consent` | `data-consent` | **Denied by default.** `true`, `"granted"` or a callback returning `true` grants it. Otherwise (including leaving it out) the pixel shows the badge and sends the liveness beacon but collects nothing until `handle.setConsent(true)`; leaving it out logs one development-only warning. |
 | `collectLevel` | `data-collect-level` | `"essential"`, `"analytics"` (default) or `"research"` (adds pointer samples). |
 | `track` | — | Per-signal override: `{ pageview, dwell, click, scroll, pointer, agent }`. |
 | `route` | — | `() => ({ name, pattern })` for the current location. |

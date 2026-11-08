@@ -23,6 +23,14 @@ the new fields.
 
 ### Changed
 
+- **BREAKING — consent is denied by default. With no `consent` option (or no
+  `data-consent="granted"`), no analytics are collected.** The badge still
+  renders and the liveness beacon still fires; in development one console
+  warning says why nothing is collected. **What you must do:** pass
+  `consent: true` or a consent callback, or wire fancy-compliance, otherwise
+  nothing is collected. On a script tag, write `data-consent="granted"` only
+  once the visitor has agreed, or push
+  `["consent", { analytics: true }]` onto `window.fancyPixelQ` when they do.
 - **BREAKING — the bundled collector is 0.4 (wire format v2).** Click labels
   now come from the clicked control only (react-fancy handles and the
   control's accessible name) instead of a container's text; single-page
@@ -41,10 +49,9 @@ the new fields.
 
 ### Added
 
-- **`consent`** (`data-consent`), forwarded to the collector: `"denied"`
-  renders the badge and sends the liveness beacon, but collects nothing until
-  `handle.setConsent(true)`. Omitted, it is `"granted"`, as in 0.3, so an
-  existing embed collects exactly as before.
+- **`consent`** (`data-consent`), forwarded to the collector: `true` /
+  `"granted"`, `false` / `"denied"`, or a callback read at start.
+  `handle.setConsent(granted)` changes it later.
 - **`collectLevel`** (`data-collect-level`), **`track`**, **`route`** and
   **`labels`** (`data-labels`), forwarded to the collector.
 - **`handle.setConsent(granted)`** and **`handle.view()`**.
