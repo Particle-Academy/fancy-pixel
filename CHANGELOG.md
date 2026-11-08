@@ -14,6 +14,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 0.4.0 — 2026-11-08
+
+Bundles `@particle-academy/fancy-heuristics-js` 0.4, which needs
+`particle-academy/fancy-heuristics` 0.6 on the server. Upgrade the server
+first. An older server still stores views, clicks, scroll and time, but not
+the new fields.
+
+### Changed
+
+- **BREAKING — the bundled collector is 0.4 (wire format v2).** Click labels
+  now come from the clicked control only (react-fancy handles and the
+  control's accessible name) instead of a container's text; single-page
+  navigations record a view; the page title and route are separate fields;
+  agent activity is no longer recorded as a click; dwell is active time;
+  scroll is milestones. **Pointer heatmap samples are off by default.**
+  **What you must do:** upgrade `fancy-heuristics` to 0.6 first. Pass
+  `collectLevel: "research"` (or `data-collect-level="research"`) if you want
+  pointer heatmaps. See the collector's changelog for the full list.
+- **BREAKING — one pixel per site key.** A second `mountPixel` (or a second
+  script tag) with the same `siteKey` returns the pixel already mounted,
+  applies its `consent`, and logs one console warning, instead of rendering a
+  second badge and starting a second collector. **What you must do:**
+  nothing, unless you mounted two pixels with one key on purpose; call
+  `destroy()` on the first before mounting again.
+
+### Added
+
+- **`consent`** (`data-consent`), forwarded to the collector: `"denied"`
+  renders the badge and sends the liveness beacon, but collects nothing until
+  `handle.setConsent(true)`. Omitted, it is `"granted"`, as in 0.3, so an
+  existing embed collects exactly as before.
+- **`collectLevel`** (`data-collect-level`), **`track`**, **`route`** and
+  **`labels`** (`data-labels`), forwarded to the collector.
+- **`handle.setConsent(granted)`** and **`handle.view()`**.
+- **A command queue, `window.fancyPixelQ`**, with `init`, `consent` and
+  `route` commands. Queued commands run on load and later pushes run at
+  once; `features` is reserved and ignored for now. Exported as
+  `processQueue()` / `runCommand()`.
+
 ### Fixed
 
 - **`href` is now escaped before it goes into the badge's markup.** A quote or angle bracket in `href` could end the attribute and add markup inside the pixel's shadow root. Only the embedding site sets `href`, so this was hardening rather than a vulnerability. Ordinary URLs render exactly as before.

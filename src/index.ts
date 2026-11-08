@@ -21,6 +21,7 @@
  */
 export { mountPixel } from "./mount.js";
 export { autoInit } from "./autoinit.js";
+export { processQueue, runCommand, type PixelCommand } from "./queue.js";
 export { sendPixelBeacon } from "./beacon.js";
 export { createPixelHost, hostStyleFor } from "./render.js";
 export {
@@ -37,4 +38,7 @@ export type {
   PixelCollector,
   PixelBeaconPayload,
   PixelShownEventDetail,
+  PixelCollectLevel,
+  PixelTrack,
+  PixelRoute,
 } from "./types.js";

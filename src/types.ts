@@ -46,6 +46,40 @@ export interface MountPixelOptions {
    * Applies to `badge` (whole chip) and `mark` (glyph).
    */
   href?: string;
+  /**
+   * Analytics consent for the collector. `"denied"` renders the badge and
+   * sends the liveness beacon, but collects nothing until
+   * `handle.setConsent(true)`. Omitted = `"granted"`, as in 0.3, for hosts
+   * that already withhold `endpoint` until consent.
+   */
+  consent?: "granted" | "denied";
+  /** Collection tier. Default `"analytics"`; `"research"` adds pointer samples. */
+  collectLevel?: PixelCollectLevel;
+  /** Per-signal override of the tier. */
+  track?: PixelTrack;
+  /** Route name / pattern for the current location, read on every view. */
+  route?: () => PixelRoute | undefined;
+  /** `"none"` records no accessible names of clicked controls. */
+  labels?: "control" | "none";
+}
+
+/** Collection tiers of the bundled collector. */
+export type PixelCollectLevel = "essential" | "analytics" | "research";
+
+/** Per-signal override, as in fancy-heuristics-js `TrackConfig`. */
+export interface PixelTrack {
+  pageview?: boolean;
+  dwell?: boolean;
+  click?: boolean;
+  scroll?: boolean;
+  pointer?: boolean;
+  agent?: boolean;
+}
+
+/** Host route identity. */
+export interface PixelRoute {
+  name?: string;
+  pattern?: string;
 }
 
 /** The payload POSTed to `${endpoint}/pixel`. Matches the frozen wire contract. */
@@ -67,6 +101,8 @@ export interface PixelCollector {
   start(): void;
   stop(): void;
   flush(): void;
+  setConsent?(granted: boolean): void;
+  view?(): void;
 }
 
 /** Handle returned by {@link mountPixel} for programmatic control. */
@@ -82,9 +118,15 @@ export interface PixelHandle {
    */
   readonly collector: PixelCollector | null;
   /** Resolved options. */
-  readonly options: Required<Omit<MountPixelOptions, "target">> & {
+  readonly options: Required<
+    Omit<MountPixelOptions, "target" | "consent" | "collectLevel" | "track" | "route" | "labels">
+  > & {
     target: string | Element | null;
   };
+  /** Grant or withdraw analytics consent. Withdrawal stops collection at once. */
+  setConsent(granted: boolean): void;
+  /** Tell the collector a navigation finished (when automatic detection is off). */
+  view(): void;
   /** Stop the collector, tear down observers, and remove the host element. */
   destroy(): void;
 }

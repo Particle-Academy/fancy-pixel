@@ -1,5 +1,5 @@
 import { sendPixelBeacon } from "./beacon.js";
-import { createPixelCollector } from "./collector.js";
+import { createPixelCollector, type PixelCollectorOptions } from "./collector.js";
 import { createPixelHost } from "./render.js";
 import type {
   MountPixelOptions,
@@ -42,6 +42,45 @@ function currentPath(): string {
  * verification + analytics. With no `endpoint`, nothing is sent (badge only).
  */
 export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
+  // One instance per site key: a site carrying both a direct tag and a GTM
+  // tag gets one pill and one collector. The later init updates consent on
+  // the existing instance instead of mounting a second one.
+  const registry = instances();
+  const key = opts.siteKey ?? "";
+  const existing = key ? registry[key] : undefined;
+  if (existing) {
+    warnOnce(key);
+    if (opts.consent !== undefined) existing.setConsent(opts.consent === "granted");
+    return existing;
+  }
+
+  const handle = mountNew(opts);
+  if (key) registry[key] = handle;
+  return handle;
+}
+
+/** Live pixels by site key, shared by every copy of the bundle on the page. */
+function instances(): Record<string, PixelHandle> {
+  const g = globalThis as { __fancyPixel?: Record<string, PixelHandle> };
+  if (!g.__fancyPixel || typeof g.__fancyPixel !== "object") g.__fancyPixel = {};
+  return g.__fancyPixel;
+}
+
+const warned = new Set<string>();
+
+function warnOnce(siteKey: string): void {
+  if (warned.has(siteKey)) return;
+  warned.add(siteKey);
+  try {
+    console.warn(
+      `[fancy-pixel] A pixel for site "${siteKey}" is already mounted on this page; reusing it instead of mounting a second one.`,
+    );
+  } catch {
+    /* no console */
+  }
+}
+
+function mountNew(opts: MountPixelOptions): PixelHandle {
   const style: PixelStyle = STYLES.includes(opts.style as PixelStyle)
     ? (opts.style as PixelStyle)
     : "badge";
@@ -130,7 +169,13 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
   let collector: PixelCollector | null = null;
   if (endpoint && collect) {
     try {
-      collector = createPixelCollector({ siteKey, endpoint });
+      const copts: PixelCollectorOptions = { siteKey, endpoint };
+      if (opts.consent !== undefined) copts.consent = opts.consent;
+      if (opts.collectLevel !== undefined) copts.collect = opts.collectLevel;
+      if (opts.track !== undefined) copts.track = opts.track;
+      if (opts.route !== undefined) copts.route = opts.route;
+      if (opts.labels !== undefined) copts.labels = opts.labels;
+      collector = createPixelCollector(copts);
       collector.start();
     } catch {
       // A collector failure must never break the host page or the badge.
@@ -148,7 +193,7 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
     target,
   };
 
-  return {
+  const handle: PixelHandle = {
     host,
     get visible() {
       return visible;
@@ -157,9 +202,27 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
       return collector;
     },
     options: resolved,
+    setConsent(granted: boolean) {
+      if (destroyed || !collector) return;
+      try {
+        collector.setConsent?.(granted);
+      } catch {
+        /* never break the host page */
+      }
+    },
+    view() {
+      if (destroyed || !collector) return;
+      try {
+        collector.view?.();
+      } catch {
+        /* never break the host page */
+      }
+    },
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      const registry = instances();
+      if (siteKey && registry[siteKey] === handle) delete registry[siteKey];
       observer?.disconnect();
       observer = null;
       if (collector) {
@@ -173,4 +236,6 @@ export function mountPixel(opts: MountPixelOptions = {}): PixelHandle {
       host.remove();
     },
   };
+
+  return handle;
 }

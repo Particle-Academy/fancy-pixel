@@ -45,7 +45,7 @@ function readScriptConfig(): MountPixelOptions | null {
   const collect =
     ds.collect !== undefined ? ds.collect !== "false" : undefined;
 
-  return {
+  const out: MountPixelOptions = {
     style: ds.style as MountPixelOptions["style"],
     mode: ds.mode as MountPixelOptions["mode"],
     siteKey: ds.site,
@@ -54,6 +54,16 @@ function readScriptConfig(): MountPixelOptions | null {
     target: ds.target ?? null,
     href: ds.href,
   };
+
+  // data-consent="denied": badge + liveness only until consent is granted
+  // (FancyPixel.processQueue / fancyPixelQ.push(["consent", {analytics:true}])).
+  if (ds.consent === "denied" || ds.consent === "granted") out.consent = ds.consent;
+  if (ds.collectLevel === "essential" || ds.collectLevel === "analytics" || ds.collectLevel === "research") {
+    out.collectLevel = ds.collectLevel;
+  }
+  if (ds.labels === "none" || ds.labels === "control") out.labels = ds.labels;
+
+  return out;
 }
 
 /**

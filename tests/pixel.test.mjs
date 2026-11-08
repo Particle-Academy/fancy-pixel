@@ -101,6 +101,9 @@ function installDom() {
   beacons.length = 0;
   lastIO = null;
   collectors.length = 0;
+  // Each test is a fresh page: forget pixels mounted by earlier tests (the
+  // one-per-site-key registry lives on globalThis).
+  delete globalThis.__fancyPixel;
   // Every mount goes through the stub factory unless a test overrides it.
   __setCollectorFactory(makeCollectorStub);
 

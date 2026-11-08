@@ -133,24 +133,47 @@ const pixel = mountPixel({
 When mounted **with** an `endpoint` and `collect` left on (the default),
 fancy-pixel also starts the bundled
 [`@particle-academy/fancy-heuristics-js`](https://github.com/Particle-Academy/fancy-heuristics-js)
-collector. It batches the site's interaction stream — `pageview`, `click`,
-`scroll` depth, `pointer` heatmap samples, `dwell` time, and embedded-**agent**
-activity — and ships it to `${endpoint}/collect` via `sendBeacon`, keyed by the
-same `siteKey`. Batches POST as:
+collector (0.4, wire format v2). It records named events — `ui.view` on every
+page and single-page navigation (with the route and the page title as separate
+fields), `ui.activate` resolved to the clicked control's handles and accessible
+name, active time (`engage.time`), scroll milestones (`engage.scroll`) and
+embedded-**agent** activity (`agent.act`, never a click) — and ships them to
+`${endpoint}/collect` via `sendBeacon`, keyed by the same `siteKey`. Pointer
+heatmap samples are only collected with `collectLevel: "research"`. The
+server must be `particle-academy/fancy-heuristics` 0.6 or newer to store the
+v2 fields. `destroy()` stops the collector (flushing any buffered events).
 
-```json
-{ "siteKey": "YOUR_SITE_KEY", "sessionId": "...", "events": [ /* Event, ... */ ] }
-```
-
-Each `Event` is the frozen `fancy-heuristics` wire shape (`kind`, `actor`,
-`path`, `ts`, plus `x`/`y`/`vw`/`vh`/`scrollPct`/`dwellMs`/`targetId`/`label` as
-relevant) — the exact shape the PHP `fancy-heuristics` ingestion already
-validates. `destroy()` stops the collector (flushing any buffered events).
+| Option | `data-*` | Meaning |
+|---|---|---|
+| `consent` | `data-consent` | `"denied"` shows the badge and sends the liveness beacon but collects nothing until `handle.setConsent(true)`. Omitted = `"granted"`, as in 0.3. |
+| `collectLevel` | `data-collect-level` | `"essential"`, `"analytics"` (default) or `"research"` (adds pointer samples). |
+| `track` | — | Per-signal override: `{ pageview, dwell, click, scroll, pointer, agent }`. |
+| `route` | — | `() => ({ name, pattern })` for the current location. |
+| `labels` | `data-labels` | `"none"` records no accessible names. |
 
 - **Opt out** with `collect: false` (programmatic) or `data-collect="false"`
   (script tag) to keep the badge + liveness beacon but skip analytics.
 - **No endpoint = nothing collected.** A badge with no `endpoint` makes no
   network requests at all.
+- **One pixel per site key.** Mounting again with the same `siteKey` (a
+  direct tag plus a tag manager, say) returns the existing pixel, applies the
+  new `consent`, and logs one console warning.
+
+### Command queue
+
+Configure the pixel before its script has loaded, or from a tag manager that
+cannot set `data-*` attributes:
+
+```js
+window.fancyPixelQ = window.fancyPixelQ || [];
+fancyPixelQ.push(["init", { siteKey: "KEY", endpoint: "https://your.site/heuristics", consent: "denied" }]);
+fancyPixelQ.push(["consent", { analytics: true }]); // when the visitor agrees
+fancyPixelQ.push(["route", location.href]);          // after a navigation, if you want to signal it
+```
+
+Queued commands run when the bundle loads; later pushes run at once. A
+repeated `init` for the same key reuses the mounted pixel, and a `route`
+signal plus the pixel's own navigation detection count once.
 
 The collector is compiled directly into `dist/fancy-pixel.global.min.js`, so the
 single external-site embed carries everything — no second `<script>`, no extra
