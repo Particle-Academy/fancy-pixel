@@ -1,6 +1,23 @@
 import type { PixelBeaconPayload } from "./types.js";
 
 /**
+ * Drop every trailing `/` from an endpoint.
+ *
+ * Trimmed by index rather than with a trailing-slash regex. A regex of the
+ * form "one or more slashes, then end of string" is retried from every
+ * position, so a long run of slashes that does not end the string costs
+ * quadratic time on the page's main thread. The endpoint is host input, so it
+ * is not automatically trustworthy. This loop is linear and needs no regex
+ * engine. It matches `joinCollect` in fancy-heuristics-js.
+ */
+export function trimTrailingSlashes(endpoint: string): string {
+  const SLASH = 47; // '/'
+  let end = endpoint.length;
+  while (end > 0 && endpoint.charCodeAt(end - 1) === SLASH) end--;
+  return endpoint.slice(0, end);
+}
+
+/**
  * Send a pixel liveness/visibility beacon to `${endpoint}/pixel`.
  *
  * Prefers `navigator.sendBeacon` (survives page unload, non-blocking),
@@ -15,7 +32,7 @@ export function sendPixelBeacon(
 ): boolean {
   if (!endpoint) return false;
 
-  const url = endpoint.replace(/\/+$/, "") + "/pixel";
+  const url = trimTrailingSlashes(endpoint) + "/pixel";
   const body = JSON.stringify(payload);
 
   try {

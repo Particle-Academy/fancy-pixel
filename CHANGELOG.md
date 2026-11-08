@@ -14,6 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 0.3.1 — 2026-11-08
+
+### Security
+
+- **A long endpoint could stall the page.** The beacon removed trailing slashes from `endpoint` with a regular expression whose running time grows with the square of the input. An endpoint containing a long run of slashes could block the host page's main thread for seconds. The slashes are now removed with a simple linear loop, the same way `@particle-academy/fancy-heuristics-js` already does it. The resulting URL is identical for every input. Nothing for you to do beyond upgrading.
+
 ### Fixed
 
 - **`CHANGELOG.md` is now in the published tarball.** `files` did not whitelist it, so npm never shipped it — and this package puts breaking changes in MINOR releases and tells you in the README to read the entry before taking one. The instruction existed for the author, who has the file, and not for the consumer, who is the only one being instructed. Nothing for you to do; the file simply arrives from this release on.
