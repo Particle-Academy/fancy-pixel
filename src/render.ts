@@ -65,9 +65,27 @@ export function hostStyleFor(mode: PixelMode): string {
   return ["display:inline-block", "vertical-align:middle"].join(";");
 }
 
+/**
+ * Escape a value for a double-quoted HTML attribute. `href` comes from the
+ * embedding page, so a quote or angle bracket in it must not be able to end
+ * the attribute and add markup inside the shadow root.
+ */
+export function escapeAttr(value: string): string {
+  let out = "";
+  for (const ch of value) {
+    if (ch === "&") out += "&amp;";
+    else if (ch === '"') out += "&quot;";
+    else if (ch === "<") out += "&lt;";
+    else if (ch === ">") out += "&gt;";
+    else if (ch === "'") out += "&#39;";
+    else out += ch;
+  }
+  return out;
+}
+
 /** Build the inner HTML of the shadow root for a given style. */
 function innerFor(style: PixelStyle, href: string): string {
-  const linkAttrs = `class="fp-link" href="${href}" target="_blank" rel="noopener noreferrer" part="link" data-fancy-pixel-link`;
+  const linkAttrs = `class="fp-link" href="${escapeAttr(href)}" target="_blank" rel="noopener noreferrer" part="link" data-fancy-pixel-link`;
 
   if (style === "mark") {
     return `<style>${RESET}

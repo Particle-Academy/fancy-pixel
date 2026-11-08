@@ -364,3 +364,16 @@ test("a collector failure never breaks the mount (badge survives)", () => {
   // destroy() must be safe even with no collector.
   handle.destroy();
 });
+
+// --- href is attribute-escaped ----------------------------------------------
+
+test("an href with quotes or angle brackets cannot break out of the attribute", () => {
+  installDom();
+  const href = 'https://example.com/?a="><img src=x onerror=alert(1)>&b=1';
+  const handle = mountPixel({ style: "badge", mode: "floating", href });
+  const html = handle.host.shadowRoot.innerHTML;
+  assert.doesNotMatch(html, /"><img/, "no raw attribute break-out");
+  assert.doesNotMatch(html, /<img/, "no injected element");
+  assert.match(html, /href="https:\/\/example\.com\/\?a=&quot;&gt;&lt;img src=x onerror=alert\(1\)&gt;&amp;b=1"/);
+  handle.destroy();
+});

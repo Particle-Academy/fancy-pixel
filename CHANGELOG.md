@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`href` is now escaped before it goes into the badge's markup.** A quote or angle bracket in `href` could end the attribute and add markup inside the pixel's shadow root. Only the embedding site sets `href`, so this was hardening rather than a vulnerability. Ordinary URLs render exactly as before.
+
 ## 0.3.1 — 2026-11-08
 
 ### Security
