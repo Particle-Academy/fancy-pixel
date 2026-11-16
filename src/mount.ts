@@ -28,7 +28,7 @@ function currentPath(): string {
 }
 
 /**
- * Mount a Fancy UI pixel into the page.
+ * Mount a Fancy pixel into the page.
  *
  * Renders the chosen style inside an open Shadow DOM (host CSS cannot hide it),
  * wires an IntersectionObserver to confirm true on-screen visibility, dispatches

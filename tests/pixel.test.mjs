@@ -209,6 +209,28 @@ test("mountPixel renders an open shadow root with the required markers", () => {
   handle.destroy();
 });
 
+// The wordmark was renamed on 2026-11-15 (owner ruling q_4b32212d): the badge
+// says "Powered by Fancy", visibly and in every aria-label. The verifiers in
+// fancy-heuristics and the showcase accept both this and the old
+// "Powered by Fancy UI", so sites that still carry the old text keep passing.
+test("every style says Powered by Fancy, never the old Fancy UI wordmark", () => {
+  installDom();
+  for (const style of ["badge", "mark", "beacon"]) {
+    const handle = mountPixel({ style, mode: "placed" });
+    const html = handle.host.shadowRoot.innerHTML;
+    assert.match(html, /aria-label="Powered by Fancy"/, `${style}: aria-label`);
+    assert.doesNotMatch(html, /Fancy UI/, `${style}: no old wordmark`);
+    handle.destroy();
+  }
+  const badge = mountPixel({ style: "badge", mode: "placed" });
+  assert.match(
+    badge.host.shadowRoot.innerHTML,
+    /<span class="fp-by">Powered by<\/span> <span class="fp-name">Fancy<\/span>/,
+    "badge: visible wordmark",
+  );
+  badge.destroy();
+});
+
 test("mark + beacon styles render their glyph/dot", () => {
   installDom();
   const mark = mountPixel({ style: "mark", mode: "placed" });

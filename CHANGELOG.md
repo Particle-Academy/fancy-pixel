@@ -16,7 +16,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Rebranded the display name to Fancy Dev Kit (for SaaSy Agents) in the README, badge and package description. The "Powered by Fancy UI" wordmark the badge renders and the detector matches is unchanged, as are package names, the npm scope and URLs, so nothing to do.
+- **The badge says "Powered by Fancy"** (was "Powered by Fancy UI"), visibly and in
+  every style's `aria-label`. Verification keeps working on sites that still
+  carry the old text: `particle-academy/fancy-heuristics` and the showcase
+  scanner accept both wordmarks, and the stable `data-fancy-badge` marker is
+  unchanged. Nothing to do; if you assert on the badge text in your own tests,
+  update the string.
+
+- Rebranded the display name to Fancy Dev Kit (for SaaSy Agents) in the README and
+  package description. Package names, the npm scope and URLs are unchanged.
 
 - **Releases need a lab-run certificate.** `publish.yml` gains a read-only
   `lab-certificate` job that every publishing job needs: a tag is published only

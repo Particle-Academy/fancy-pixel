@@ -1,7 +1,7 @@
 import type { PixelMode, PixelStyle } from "./types.js";
 
 /**
- * The Fancy UI logo glyph as an inline SVG string. A rounded-square mark with
+ * The Fancy logo glyph as an inline SVG string. A rounded-square mark with
  * an orbiting particle — self-contained, no external asset, scales cleanly.
  */
 function logoGlyph(size: number): string {
@@ -98,7 +98,7 @@ function innerFor(style: PixelStyle, href: string): string {
       }
     </style>
     <div class="fp-root" part="root">
-      <a ${linkAttrs} aria-label="Powered by Fancy UI">
+      <a ${linkAttrs} aria-label="Powered by Fancy">
         <span class="fp-mark">${logoGlyph(22)}</span>
       </a>
     </div>`;
@@ -124,7 +124,7 @@ function innerFor(style: PixelStyle, href: string): string {
       }
     </style>
     <div class="fp-root" part="root">
-      <a ${linkAttrs} aria-label="Powered by Fancy UI">
+      <a ${linkAttrs} aria-label="Powered by Fancy">
         <span class="fp-beacon">
           <span class="fp-pulse-ring fp-pulse"></span>
           <span class="fp-dot"></span>
@@ -156,10 +156,10 @@ function innerFor(style: PixelStyle, href: string): string {
     }
   </style>
   <div class="fp-root" part="root">
-    <a ${linkAttrs} aria-label="Powered by Fancy UI">
+    <a ${linkAttrs} aria-label="Powered by Fancy">
       <span class="fp-badge">
         ${logoGlyph(16)}
-        <span><span class="fp-by">Powered by</span> <span class="fp-name">Fancy UI</span></span>
+        <span><span class="fp-by">Powered by</span> <span class="fp-name">Fancy</span></span>
       </span>
     </a>
   </div>`;

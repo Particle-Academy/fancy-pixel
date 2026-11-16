@@ -10,7 +10,7 @@ is part of verification).
 
 One embed delivers three things:
 
-1. **Badge** — a "Powered by Fancy UI" chip / mark / beacon, host-CSS-proof.
+1. **Badge** — a "Powered by Fancy" chip / mark / beacon, host-CSS-proof.
 2. **Verification beacon** — a `sendBeacon` liveness ping to `${endpoint}/pixel`
    on mount and every visibility change (proves the badge is really on-screen).
 3. **Interaction analytics** — clicks, scroll depth, pointer heatmap, dwell, and
@@ -27,7 +27,7 @@ Three styles, two placement modes:
 
 | Style    | Renders                                  |
 | -------- | ---------------------------------------- |
-| `badge`  | "Powered by Fancy UI" wordmark + glyph   |
+| `badge`  | "Powered by Fancy" wordmark + glyph      |
 | `mark`   | Logo glyph only                          |
 | `beacon` | A small pulsing dot                      |
 

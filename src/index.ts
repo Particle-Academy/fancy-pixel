@@ -1,7 +1,7 @@
 /**
  * @particle-academy/fancy-pixel
  *
- * Embeddable Fancy UI verification badge + liveness/collection beacon.
+ * Embeddable Fancy verification badge + liveness/collection beacon.
  * Zero runtime dependencies. Renders inside an open Shadow DOM so host page
  * CSS cannot hide it — visibility is part of verification.
  *
