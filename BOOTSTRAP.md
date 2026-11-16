@@ -12,7 +12,7 @@ Follow the workspace publishing protocol
 
 ```bash
 gh repo create Particle-Academy/fancy-pixel --public \
-  --description "Embeddable Fancy UI verification badge + liveness beacon (zero-dep, Shadow DOM)."
+  --description "Embeddable Fancy Dev Kit verification badge + liveness beacon (zero-dep, Shadow DOM)."
 ```
 
 Then add this folder as the remote and push `main` (no tag yet):

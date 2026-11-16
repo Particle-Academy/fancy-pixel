@@ -2,7 +2,7 @@
 
 [![Fancified](art/fancified.svg)](https://particle.academy)
 
-**All-in-one Fancy UI embed.** A single `<script>` renders the verification
+**All-in-one Fancy Dev Kit embed.** A single `<script>` renders the verification
 **badge** AND pipes the site's full interaction analytics to your host —
 Google-Analytics-style, keyed by `site_key`. Vanilla TypeScript, rendered
 inside an **open Shadow DOM** so the host page's CSS cannot hide it (visibility
@@ -36,7 +36,7 @@ Three styles, two placement modes:
 | `placed`   | Inline at a target selector/element      |
 | `floating` | `position: fixed` bottom-right corner    |
 
-Every style emits the same `data-fancy-badge` marker the Fancy UI showcase
+Every style emits the same `data-fancy-badge` marker the Fancy Dev Kit showcase
 scanner detects, plus a stable `data-fancy-pixel` handle and
 `data-fancy-pixel-style`.
 
@@ -216,7 +216,7 @@ MIT
 
 ---
 
-## ⭐ Star Fancy UI
+## ⭐ Star Fancy Dev Kit
 
 If this package is useful to you, a quick ⭐ on the repo really helps us build a better kit. Thank you!
 

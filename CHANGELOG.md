@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Rebranded the display name to Fancy Dev Kit (for SaaSy Agents) in the README, badge and package description. The "Powered by Fancy UI" wordmark the badge renders and the detector matches is unchanged, as are package names, the npm scope and URLs, so nothing to do.
+
 - **Releases need a lab-run certificate.** `publish.yml` gains a read-only
   `lab-certificate` job that every publishing job needs: a tag is published only
   when the fancy-labs lab has certified that exact version and commit. Consumers
