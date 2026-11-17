@@ -32,6 +32,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   do nothing; this changes how releases are cut, not what the package does.
 - **Docs:** `AGENTS.md` added: the guide to using this package (install, its entries on the Fancy MCP catalog server, API essentials, traps), and it ships in the package. `CONTRIBUTING.md` added for the contributor notes, with `CLAUDE.md` as a symlink to it. The README points to the MCP server and to `AGENTS.md`. No code changed; nothing to do.
 
+### Fixed
+
+- **Docs:** removed the stale `BOOTSTRAP.md`. It described a never-published
+  `0.0.0` package awaiting its first release; the package has been on npm since
+  0.1.0 and is at 0.4.0. The publishing procedure lives in the envelope's
+  `.ai/knowledge/publishing.md`. No code changed; nothing to do.
+
 ## 0.4.0 — 2026-11-08
 
 Bundles `@particle-academy/fancy-heuristics-js` 0.4, which needs
