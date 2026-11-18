@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **CI: the lab-certificate gate verifies against the lab's rotated key list.**
+  The lab's first signing key is retired: certificates it already issued still
+  verify, and nothing new it signs ever can. Consumers do nothing.
+
 - **The badge says "Powered by Fancy"** (was "Powered by Fancy UI"), visibly and in
   every style's `aria-label`. Verification keeps working on sites that still
   carry the old text: `particle-academy/fancy-heuristics` and the showcase
