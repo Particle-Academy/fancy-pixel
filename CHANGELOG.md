@@ -14,6 +14,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-11-18
+
+**Nothing to do unless your own tests assert the badge text.** The badge now
+reads "Powered by Fancy"; if a test of yours matches "Powered by Fancy UI",
+update the string. Verification keeps working on sites that still carry the old
+text: upgrade `particle-academy/fancy-heuristics` to 0.7.0, which recognises both.
+Minor rather than patch because the visible text changed. Lab-certified by
+`pixel-badge-v1`, the first lab test covering this package: the badge, every
+style, the shown event, the liveness beacon and the analytics batches, in a real
+browser.
+
 ### Changed
 
 - **CI: the lab-certificate gate verifies against the lab's rotated key list.**
