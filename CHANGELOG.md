@@ -27,16 +27,16 @@ browser.
 
 ### Changed
 
-- **CI: the lab-certificate gate verifies against the lab's rotated key list.**
-  The lab's first signing key is retired: certificates it already issued still
-  verify, and nothing new it signs ever can. Consumers do nothing.
-
 - **The badge says "Powered by Fancy"** (was "Powered by Fancy UI"), visibly and in
   every style's `aria-label`. Verification keeps working on sites that still
   carry the old text: `particle-academy/fancy-heuristics` and the showcase
   scanner accept both wordmarks, and the stable `data-fancy-badge` marker is
   unchanged. Nothing to do; if you assert on the badge text in your own tests,
   update the string.
+
+- **CI: the lab-certificate gate verifies against the lab's rotated key list.**
+  The lab's first signing key is retired: certificates it already issued still
+  verify, and nothing new it signs ever can. Consumers do nothing.
 
 - Rebranded the display name to Fancy Dev Kit (for SaaSy Agents) in the README and
   package description. Package names, the npm scope and URLs are unchanged.
