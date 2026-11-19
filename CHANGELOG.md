@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- CI: re-pin org third-party allowlist to 2614224
+
 ## [0.5.0] — 2026-11-18
 
 **Nothing to do unless your own tests assert the badge text.** The badge now
